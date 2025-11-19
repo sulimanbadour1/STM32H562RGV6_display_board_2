@@ -2,20 +2,14 @@
 
 ## Screenshots
 
-<div style="display: flex; gap: 10px;">
-  <div>
-    <img src="photos/sc3.jpg" alt="Temperature Control Screen" width="300"><br>
-    <small>Temperature Control Screen</small>
-  </div>
-  <div>
-    <img src="photos/sc2.jpg" alt="Schedule Screen" width="300"><br>
-    <small>Schedule Screen</small>
-  </div>
-  <div>
-    <img src="photos/sc1.jpg" alt="Add Schedule Screen" width="300"><br>
-    <small>Add Schedule Screen</small>
-  </div>
-</div>
+### Temperature Control Screen
+<img src="photos/sc3.jpg" alt="Temperature Control Screen" width="400">
+
+### Schedule Screen
+<img src="photos/sc2.jpg" alt="Schedule Screen" width="400">
+
+### Add Schedule Screen
+<img src="photos/sc1.jpg" alt="Add Schedule Screen" width="400">
 
 ## Overview
 This project implements a touchscreen GUI for a temperature control system on an STM32H5 microcontroller with an ILI9488 480x320 TFT display.
