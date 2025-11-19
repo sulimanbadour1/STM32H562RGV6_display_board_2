@@ -1,0 +1,10 @@
+../Core/Src/LCD_ILI9488.c:468:20:SHORT_DELAY	4	static,ignoring_inline_asm
+../Core/Src/LCD_ILI9488.c:516:20:LCD_WR_STROBE	8	static,ignoring_inline_asm
+../Core/Src/LCD_ILI9488.c:541:13:ILI9488_WriteBus	16	static
+../Core/Src/LCD_ILI9488.c:569:6:ILI9488_WriteCommand	16	static
+../Core/Src/LCD_ILI9488.c:580:6:ILI9488_WriteData	16	static
+../Core/Src/LCD_ILI9488.c:592:6:ILI9488_Reset	8	static
+../Core/Src/LCD_ILI9488.c:600:6:ILI9488_Init	8	static
+../Core/Src/LCD_ILI9488.c:679:6:ILI9488_SetAddressWindow	24	static
+../Core/Src/LCD_ILI9488.c:696:6:ILI9488_DrawPixel	16	static
+../Core/Src/LCD_ILI9488.c:760:6:ILI9488_FillRainbow	16	static

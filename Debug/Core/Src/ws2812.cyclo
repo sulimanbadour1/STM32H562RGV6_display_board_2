@@ -1,0 +1,5 @@
+../Core/Src/ws2812.c:169:6:WS2812_send_random_colors_with_brightness	2
+../Core/Src/ws2812.c:200:6:WS2812_send_random_colors	2
+../Core/Src/ws2812.c:225:6:HAL_TIM_PWM_PulseFinishedCallback	1
+../Core/Src/ws2812.c:233:6:WS2812_Send	5
+../Core/Src/ws2812.c:271:6:WS2812_send_colors_with_brightness	5

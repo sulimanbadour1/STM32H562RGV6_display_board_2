@@ -1,0 +1,8 @@
+../Core/Src/GUI.c:77:6:Plot_GUI_screen_1	2
+../Core/Src/GUI.c:223:6:Plot_GUI_screen_2	1
+../Core/Src/GUI.c:253:6:Plot_GUI_screen_3	1
+../Core/Src/GUI.c:316:6:Plot_GUI_screen_4	1
+../Core/Src/GUI.c:367:13:Draw_Modern_Button	1
+../Core/Src/GUI.c:397:6:Plot_Touchscreen_Temperature_Screen	2
+../Core/Src/GUI.c:556:6:Plot_Touchscreen_Schedule_Screen	1
+../Core/Src/GUI.c:668:6:Plot_Touchscreen_AddSchedule_Screen	1

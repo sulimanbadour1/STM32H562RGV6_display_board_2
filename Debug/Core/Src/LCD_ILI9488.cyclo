@@ -1,0 +1,10 @@
+../Core/Src/LCD_ILI9488.c:468:20:SHORT_DELAY	1
+../Core/Src/LCD_ILI9488.c:516:20:LCD_WR_STROBE	1
+../Core/Src/LCD_ILI9488.c:541:13:ILI9488_WriteBus	1
+../Core/Src/LCD_ILI9488.c:569:6:ILI9488_WriteCommand	1
+../Core/Src/LCD_ILI9488.c:580:6:ILI9488_WriteData	1
+../Core/Src/LCD_ILI9488.c:592:6:ILI9488_Reset	1
+../Core/Src/LCD_ILI9488.c:600:6:ILI9488_Init	1
+../Core/Src/LCD_ILI9488.c:679:6:ILI9488_SetAddressWindow	1
+../Core/Src/LCD_ILI9488.c:696:6:ILI9488_DrawPixel	1
+../Core/Src/LCD_ILI9488.c:760:6:ILI9488_FillRainbow	3

@@ -1,0 +1,16 @@
+!SESSION 2025-11-18 14:49:46.522 -----------------------------------------------
+eclipse.buildId=Version 1.19.0
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Framework arguments:  E:\Novak_part_time_job\display_c\STM32H562RGV6_display_board_2 1\STM32H562RGV6_display_board_2\.project
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 E:\Novak_part_time_job\display_c\STM32H562RGV6_display_board_2 1\STM32H562RGV6_display_board_2\.project
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2025-11-18 14:49:55.090
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2025-11-18 14:49:55.091
+!MESSAGE Log4j2 initialized with config file E:\Novak_part_time_job\display_c\STM32H562RGV6_display_board_2 1\STM32H562RGV6_display_board_2\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2025-11-18 14:49:57.658
+!MESSAGE Started RMI Server, listening on port 41337
