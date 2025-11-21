@@ -3,6 +3,13 @@
 ../Core/Src/GUI.c:253:6:Plot_GUI_screen_3	72	static
 ../Core/Src/GUI.c:316:6:Plot_GUI_screen_4	72	static
 ../Core/Src/GUI.c:367:13:Draw_Modern_Button	40	static
-../Core/Src/GUI.c:397:6:Plot_Touchscreen_Temperature_Screen	208	static
-../Core/Src/GUI.c:556:6:Plot_Touchscreen_Schedule_Screen	176	static
-../Core/Src/GUI.c:668:6:Plot_Touchscreen_AddSchedule_Screen	160	static
+../Core/Src/GUI.c:385:20:GetWeekdayShort	16	static
+../Core/Src/GUI.c:394:20:GetWeekdayLong	16	static
+../Core/Src/GUI.c:403:13:Draw_Wizard_Progress	48	static
+../Core/Src/GUI.c:438:6:Plot_Touchscreen_Temperature_Screen	208	static
+../Core/Src/GUI.c:597:6:Plot_Touchscreen_Schedule_Screen	176	static
+../Core/Src/GUI.c:709:6:Plot_Touchscreen_AddSchedule_Screen	168	static
+../Core/Src/GUI.c:798:6:Plot_Touchscreen_ScheduleWizard_Day	160	static
+../Core/Src/GUI.c:880:6:Plot_Touchscreen_ScheduleWizard_Time	168	static
+../Core/Src/GUI.c:969:6:Plot_Touchscreen_ScheduleWizard_Temperature	184	static
+../Core/Src/GUI.c:1075:6:Plot_Touchscreen_ScheduleWizard_Name	160	static

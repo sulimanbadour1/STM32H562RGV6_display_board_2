@@ -408,6 +408,18 @@ int main(void)
   Plot_Touchscreen_AddSchedule_Screen(2025, 11, 26, 19, 47, 33);
   HAL_Delay(5000);
 
+  // Schedule wizard demonstration (multi-step)
+  Plot_Touchscreen_ScheduleWizard_Day(2025, 11, 26, 19, 47, 33, 0);
+  HAL_Delay(3000);
+  Plot_Touchscreen_ScheduleWizard_Time(2025, 11, 26, 19, 47, 33, 0, 9, 0);
+  HAL_Delay(5000);
+
+  Plot_Touchscreen_ScheduleWizard_Temperature(2025, 11, 26, 19, 47, 33, 250, 0, 9, 0);
+  HAL_Delay(5000);
+
+  Plot_Touchscreen_ScheduleWizard_Name(2025, 11, 26, 19, 47, 33, "Morning Warmup", 250, 0, 9, 0);
+  HAL_Delay(5000);
+
   // prepare for normal run with black LCd background
   ILI9488_FillScreen(BLACK);
 

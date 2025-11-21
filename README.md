@@ -68,6 +68,43 @@ Screen for creating new schedule entries.
 - Two bottom buttons: Cancel and Save (both return to Schedule screen)
 - Clean, organized design
 
+### 4. Schedule Wizard (`Plot_Touchscreen_ScheduleWizard_*`)
+Multi-step flow for creating schedule entries with weekday, time, temperature, and name. The wizard consists of 4 separate screens for a clean, focused experience.
+
+**Step 1 – Day Selection (`Plot_Touchscreen_ScheduleWizard_Day`)**
+- Single row of 7 day buttons (Mon–Sun) for compact layout
+- Selected day highlighted with DARK_GRAY background
+- Shows selected day name below buttons
+- Knob hint with icon: "Use knob to change day"
+- Navigation: `Back`, `Next`
+
+**Step 2 – Time Selection (`Plot_Touchscreen_ScheduleWizard_Time`)**
+- Large time display panel (HH:MM format) with black background
+- Increase/Decrease buttons (+/-) on the right side for time adjustment
+- Consistent styling with temperature screen
+- Knob hint with icon: "Use knob to adjust time"
+- Navigation: `Back`, `Next`
+
+**Step 3 – Temperature Selection (`Plot_Touchscreen_ScheduleWizard_Temperature`)**
+- Large temperature display panel with centered value
+- Increase/Decrease buttons (+/-) on the right side
+- Temperature shown in format: XX.X°C
+- Knob hint with icon: "Use knob to adjust temperature"
+- Navigation: `Back`, `Next`
+
+**Step 4 – Name & Confirm (`Plot_Touchscreen_ScheduleWizard_Name`)**
+- Name input card for schedule entry name
+- Two summary cards showing selected day/time and temperature
+- Compact layout with smaller text for better fit
+- Navigation: `Back`, `Save`
+
+**Design Features:**
+- All steps use consistent button colors (GRAY background, WHITE text)
+- Step labels use smaller text (scale 2.5) for cleaner appearance
+- Knob hints include visual icon (rotary encoder symbol) for consistency
+- Spacing optimized for better visual balance
+- All screens share the same navy/gray color palette
+
 ## Navigation Flow
 
 ```
@@ -75,8 +112,14 @@ Temperature Screen (Main)
     ↓ [Schedule button]
 Schedule Screen
     ↓ [Add New button]        ↑ [Back button]
-Add Schedule Screen            ↑
-    ↓ [Cancel/Save button]
+Schedule Wizard – Step 1 (Day Selection)
+    ↓ [Next]
+Wizard – Step 2 (Time Selection)
+    ↓ [Next]
+Wizard – Step 3 (Temperature Selection)
+    ↓ [Next]
+Wizard – Step 4 (Name & Confirm)
+    ↓ [Save]
 Schedule Screen
     ↑ [Back button]
 Temperature Screen
@@ -84,7 +127,12 @@ Temperature Screen
 
 **Navigation Buttons:**
 - **Temperature Screen**: Schedule → Schedule Screen, On/Off → Toggle system, Reset → Reset temperature
-- **Schedule Screen**: Back → Temperature Screen, Add New → Add Schedule Screen
+- **Schedule Screen**: Back → Temperature Screen, Add New → Schedule Wizard Step 1
+- **Schedule Wizard**:
+  - Step 1 (Day): Back → Schedule Screen, Next → Step 2
+  - Step 2 (Time): Back → Step 1, Next → Step 3
+  - Step 3 (Temperature): Back → Step 2, Next → Step 4
+  - Step 4 (Name & Confirm): Back → Step 3, Save → Schedule Screen
 - **Add Schedule Screen**: Cancel → Schedule Screen, Save → Schedule Screen
 
 ## Files Modified
@@ -97,7 +145,14 @@ Temperature Screen
 
 The screens are called in sequence in `main.c`:
 ```c
+// Main screens
 Plot_Touchscreen_Temperature_Screen(16, 2025, 11, 25, 8, 32, 25);
 Plot_Touchscreen_Schedule_Screen(2025, 11, 26, 19, 47, 33);
 Plot_Touchscreen_AddSchedule_Screen(2025, 11, 26, 19, 47, 33);
+
+// Schedule Wizard (4-step flow)
+Plot_Touchscreen_ScheduleWizard_Day(2025, 11, 26, 19, 47, 33, 0);
+Plot_Touchscreen_ScheduleWizard_Time(2025, 11, 26, 19, 47, 33, 0, 9, 0);
+Plot_Touchscreen_ScheduleWizard_Temperature(2025, 11, 26, 19, 47, 33, 250, 0, 9, 0);
+Plot_Touchscreen_ScheduleWizard_Name(2025, 11, 26, 19, 47, 33, "Morning Warmup", 250, 0, 9, 0);
 ```

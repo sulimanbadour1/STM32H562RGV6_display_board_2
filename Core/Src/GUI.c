@@ -379,6 +379,47 @@ static void Draw_Modern_Button(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y
     ILI9488_DrawString(text_x, text_y, scale, (char *)text, text_color, bg_color);
 }
 
+static const char *const WEEKDAY_SHORT_NAMES[] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+static const char *const WEEKDAY_LONG_NAMES[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+
+static const char *GetWeekdayShort(uint8_t index)
+{
+    if (index < 7)
+    {
+        return WEEKDAY_SHORT_NAMES[index];
+    }
+    return "Day";
+}
+
+static const char *GetWeekdayLong(uint8_t index)
+{
+    if (index < 7)
+    {
+        return WEEKDAY_LONG_NAMES[index];
+    }
+    return "Any Day";
+}
+
+static void Draw_Wizard_Progress(uint8_t current_step, uint8_t total_steps,
+                                 uint16_t x, uint16_t y, uint16_t width, uint16_t height)
+{
+    if (total_steps == 0)
+    {
+        return;
+    }
+
+    uint16_t segment_spacing = 8;
+    uint16_t segment_width = (width - ((total_steps - 1) * segment_spacing)) / total_steps;
+
+    for (uint8_t step = 0; step < total_steps; ++step)
+    {
+        uint16_t segment_x1 = x + step * (segment_width + segment_spacing);
+        uint16_t segment_x2 = segment_x1 + segment_width;
+        uint16_t color = (step < current_step) ? LIGHT_GRAY : DARK_GRAY;
+        ILI9488_FilledRectangle(segment_x1, y, segment_x2, y + height, color);
+    }
+}
+
 /**
  * @brief Draws the temperature control screen
  * @param temperature: Current temperature value (in 0.1°C units, e.g., 215 = 21.5°C)
@@ -418,7 +459,7 @@ void Plot_Touchscreen_Temperature_Screen(int16_t temperature,
     ILI9488_DrawString(MARGIN, 8, 2, "Temperature Control", WHITE, DARK_BLUE);
 
     // Date display (left side of header)
-    sprintf(buffer, "%04d-%02d-%02d", year, month, day);
+    sprintf(buffer, "%02d %02d %04d", day, month, year);
     ILI9488_DrawString(MARGIN, 30, 2, buffer, LIGHT_GRAY, DARK_BLUE);
 
     // Time display (right side of header)
@@ -492,13 +533,13 @@ void Plot_Touchscreen_Temperature_Screen(int16_t temperature,
     uint16_t inc_btn_y1 = ADJ_BTN_START_Y;
     uint16_t inc_btn_y2 = inc_btn_y1 + ADJ_BTN_HEIGHT;
     Draw_Modern_Button(ADJ_BTN_X1, inc_btn_y1, ADJ_BTN_X2, inc_btn_y2,
-                       "+", DARK_GRAY, WHITE, LIGHT_GRAY, 5);
+                       "+", GRAY, WHITE, LIGHT_GRAY, 5);
 
     // Decrease button (bottom) - smaller, equal size, centered with temperature box
     uint16_t dec_btn_y1 = inc_btn_y2 + ADJ_BTN_SPACING;
     uint16_t dec_btn_y2 = dec_btn_y1 + ADJ_BTN_HEIGHT;
     Draw_Modern_Button(ADJ_BTN_X1, dec_btn_y1, ADJ_BTN_X2, dec_btn_y2,
-                       "-", DARK_GRAY, WHITE, LIGHT_GRAY, 5);
+                       "-", GRAY, WHITE, LIGHT_GRAY, 5);
 
     // ===== KNOB INDICATOR =====
     // Positioned below temperature box with proper spacing and visible logo
@@ -576,7 +617,7 @@ void Plot_Touchscreen_Schedule_Screen(uint16_t year, uint8_t month, uint8_t day,
     ILI9488_DrawString(MARGIN, 8, 2, "Temperature Schedule", WHITE, DARK_BLUE);
 
     // Date display (left side of header)
-    sprintf(buffer, "%04d-%02d-%02d", year, month, day);
+    sprintf(buffer, "%02d %02d %04d", day, month, year);
     ILI9488_DrawString(MARGIN, 30, 2, buffer, LIGHT_GRAY, DARK_BLUE);
 
     // Time display (right side of header)
@@ -585,11 +626,11 @@ void Plot_Touchscreen_Schedule_Screen(uint16_t year, uint8_t month, uint8_t day,
     ILI9488_DrawString(time_x, 30, 2, buffer, WHITE, DARK_BLUE);
 
     // ===== SCHEDULE LIST =====
-    // Schedule entries displayed as boxes in 2 columns with improved styling
-    uint16_t list_y_start = HEADER_HEIGHT + MARGIN;
-    uint16_t box_spacing = 15; // Increased spacing between boxes
-    uint16_t box_height = 80;  // Taller boxes for better appearance
-    uint16_t box_padding = 12; // Internal padding for text
+    // Schedule entries displayed as boxes in 2 columns (smaller elements)
+    uint16_t list_y_start = HEADER_HEIGHT + MARGIN + 5;
+    uint16_t box_spacing = 12; // Reduced spacing between boxes
+    uint16_t box_height = 70;  // Smaller boxes
+    uint16_t box_padding = 12; // Reduced internal padding
     uint16_t available_width = SCREEN_WIDTH - (MARGIN * 2);
     uint16_t box_width = (available_width - box_spacing) / 2; // Two boxes per row
 
@@ -602,10 +643,10 @@ void Plot_Touchscreen_Schedule_Screen(uint16_t year, uint8_t month, uint8_t day,
     uint16_t box1_y1 = row1_y;
     uint16_t box1_y2 = box1_y1 + box_height;
     ILI9488_FilledRectangle(box1_x1, box1_y1, box1_x2, box1_y2, GRAY);
-    ILI9488_DrawString(box1_x1 + box_padding, box1_y1 + 20, 2.5, "09:00", WHITE, GRAY);
-    ILI9488_DrawString(box1_x1 + box_padding, box1_y1 + 40, 2.5, "->", LIGHT_GRAY, GRAY);
+    ILI9488_DrawString(box1_x1 + box_padding, box1_y1 + 15, 2.5, "09:00", WHITE, GRAY);
+    ILI9488_DrawString(box1_x1 + box_padding, box1_y1 + 32, 2.5, "->", LIGHT_GRAY, GRAY);
     sprintf(buffer, "%d.%d C", 22, 0);
-    ILI9488_DrawString(box1_x1 + box_padding, box1_y1 + 60, 2.5, buffer, WHITE, GRAY);
+    ILI9488_DrawString(box1_x1 + box_padding, box1_y1 + 50, 2.5, buffer, WHITE, GRAY);
 
     // Schedule entry 2 (right box)
     uint16_t box2_x1 = box1_x2 + box_spacing;
@@ -613,10 +654,10 @@ void Plot_Touchscreen_Schedule_Screen(uint16_t year, uint8_t month, uint8_t day,
     uint16_t box2_y1 = row1_y;
     uint16_t box2_y2 = box2_y1 + box_height;
     ILI9488_FilledRectangle(box2_x1, box2_y1, box2_x2, box2_y2, GRAY);
-    ILI9488_DrawString(box2_x1 + box_padding, box2_y1 + 20, 2.5, "12:00", WHITE, GRAY);
-    ILI9488_DrawString(box2_x1 + box_padding, box2_y1 + 40, 2.5, "->", LIGHT_GRAY, GRAY);
+    ILI9488_DrawString(box2_x1 + box_padding, box2_y1 + 15, 2.5, "12:00", WHITE, GRAY);
+    ILI9488_DrawString(box2_x1 + box_padding, box2_y1 + 32, 2.5, "->", LIGHT_GRAY, GRAY);
     sprintf(buffer, "%d.%d C", 24, 5);
-    ILI9488_DrawString(box2_x1 + box_padding, box2_y1 + 60, 2.5, buffer, WHITE, GRAY);
+    ILI9488_DrawString(box2_x1 + box_padding, box2_y1 + 50, 2.5, buffer, WHITE, GRAY);
 
     // Row 2: Entry 3 (left) and Entry 4 (right)
     uint16_t row2_y = row1_y + box_height + box_spacing;
@@ -627,10 +668,10 @@ void Plot_Touchscreen_Schedule_Screen(uint16_t year, uint8_t month, uint8_t day,
     uint16_t box3_y1 = row2_y;
     uint16_t box3_y2 = box3_y1 + box_height;
     ILI9488_FilledRectangle(box3_x1, box3_y1, box3_x2, box3_y2, GRAY);
-    ILI9488_DrawString(box3_x1 + box_padding, box3_y1 + 20, 2.5, "18:00", WHITE, GRAY);
-    ILI9488_DrawString(box3_x1 + box_padding, box3_y1 + 40, 2.5, "->", LIGHT_GRAY, GRAY);
+    ILI9488_DrawString(box3_x1 + box_padding, box3_y1 + 15, 2.5, "18:00", WHITE, GRAY);
+    ILI9488_DrawString(box3_x1 + box_padding, box3_y1 + 32, 2.5, "->", LIGHT_GRAY, GRAY);
     sprintf(buffer, "%d.%d C", 20, 0);
-    ILI9488_DrawString(box3_x1 + box_padding, box3_y1 + 60, 2.5, buffer, WHITE, GRAY);
+    ILI9488_DrawString(box3_x1 + box_padding, box3_y1 + 50, 2.5, buffer, WHITE, GRAY);
 
     // Schedule entry 4 (right box)
     uint16_t box4_x1 = box3_x2 + box_spacing;
@@ -638,14 +679,14 @@ void Plot_Touchscreen_Schedule_Screen(uint16_t year, uint8_t month, uint8_t day,
     uint16_t box4_y1 = row2_y;
     uint16_t box4_y2 = box4_y1 + box_height;
     ILI9488_FilledRectangle(box4_x1, box4_y1, box4_x2, box4_y2, GRAY);
-    ILI9488_DrawString(box4_x1 + box_padding, box4_y1 + 20, 2.5, "22:00", WHITE, GRAY);
-    ILI9488_DrawString(box4_x1 + box_padding, box4_y1 + 40, 2.5, "->", LIGHT_GRAY, GRAY);
+    ILI9488_DrawString(box4_x1 + box_padding, box4_y1 + 15, 2.5, "22:00", WHITE, GRAY);
+    ILI9488_DrawString(box4_x1 + box_padding, box4_y1 + 32, 2.5, "->", LIGHT_GRAY, GRAY);
     sprintf(buffer, "%d.%d C", 18, 5);
-    ILI9488_DrawString(box4_x1 + box_padding, box4_y1 + 60, 2.5, buffer, WHITE, GRAY);
+    ILI9488_DrawString(box4_x1 + box_padding, box4_y1 + 50, 2.5, buffer, WHITE, GRAY);
 
     // ===== BOTTOM BUTTON ROW =====
-    // Two buttons at the bottom with proper spacing (matching temperature screen style)
-    const uint16_t BOTTOM_BUTTON_WIDTH = 200;
+    // Two buttons at the bottom (smaller)
+    const uint16_t BOTTOM_BUTTON_WIDTH = 180;
     const uint16_t TOTAL_BUTTON_WIDTH = (BOTTOM_BUTTON_WIDTH * 2) + BUTTON_SPACING;
     const uint16_t BOTTOM_START_X = (SCREEN_WIDTH - TOTAL_BUTTON_WIDTH) / 2;
 
@@ -691,7 +732,7 @@ void Plot_Touchscreen_AddSchedule_Screen(uint16_t year, uint8_t month, uint8_t d
     ILI9488_DrawString(MARGIN, 8, 2, "Add Schedule Entry", WHITE, DARK_BLUE);
 
     // Date display (left side of header)
-    sprintf(buffer, "%04d-%02d-%02d", year, month, day);
+    sprintf(buffer, "%02d %02d %04d", day, month, year);
     ILI9488_DrawString(MARGIN, 30, 2, buffer, LIGHT_GRAY, DARK_BLUE);
 
     // Time display (right side of header)
@@ -700,38 +741,41 @@ void Plot_Touchscreen_AddSchedule_Screen(uint16_t year, uint8_t month, uint8_t d
     ILI9488_DrawString(time_x, 30, 2, buffer, WHITE, DARK_BLUE);
 
     // ===== INPUT CARDS =====
-    // Calculate available space for cards
-    uint16_t cards_start_y = HEADER_HEIGHT + MARGIN;
+    // Calculate available space for cards (smaller elements)
+    uint16_t cards_start_y = HEADER_HEIGHT + MARGIN + 10;
     uint16_t cards_end_y = BOTTOM_BUTTON_Y - MARGIN;
     uint16_t available_height = cards_end_y - cards_start_y;
-    uint16_t total_cards_height = (CARD_HEIGHT * 2) + NOTES_HEIGHT + (CARD_SPACING * 2);
+    const uint16_t CARD_SPACING_SIMPLE = 12; // Reduced spacing
+    const uint16_t CARD_HEIGHT_SIMPLE = 48;  // Smaller cards
+    const uint16_t NOTES_HEIGHT_SIMPLE = 55; // Smaller notes card
+    uint16_t total_cards_height = (CARD_HEIGHT_SIMPLE * 2) + NOTES_HEIGHT_SIMPLE + (CARD_SPACING_SIMPLE * 2);
     uint16_t cards_y = cards_start_y + (available_height - total_cards_height) / 2; // Center cards vertically
 
     uint16_t card_x1 = MARGIN;
     uint16_t card_x2 = SCREEN_WIDTH - MARGIN;
-    uint16_t card_text_y_offset = (CARD_HEIGHT / 2) - 8; // Center text vertically in card
+    uint16_t card_text_y_offset = (CARD_HEIGHT_SIMPLE / 2) - 8; // Center text vertically in card
 
     // Time card
     uint16_t time_card_y = cards_y;
-    ILI9488_FilledRectangle(card_x1, time_card_y, card_x2, time_card_y + CARD_HEIGHT, GRAY);
-    ILI9488_DrawString(card_x1 + 15, time_card_y + card_text_y_offset, 2, "Time", WHITE, GRAY);
+    ILI9488_FilledRectangle(card_x1, time_card_y, card_x2, time_card_y + CARD_HEIGHT_SIMPLE, GRAY);
+    ILI9488_DrawString(card_x1 + 18, time_card_y + card_text_y_offset, 2.5, "Time", WHITE, GRAY);
     ILI9488_DrawString(card_x2 - 100, time_card_y + card_text_y_offset, 2, "HH:MM", LIGHT_GRAY, GRAY);
 
     // Temperature card
-    uint16_t temp_card_y = time_card_y + CARD_HEIGHT + CARD_SPACING;
-    ILI9488_FilledRectangle(card_x1, temp_card_y, card_x2, temp_card_y + CARD_HEIGHT, GRAY);
-    ILI9488_DrawString(card_x1 + 15, temp_card_y + card_text_y_offset, 2, "Temperature", WHITE, GRAY);
+    uint16_t temp_card_y = time_card_y + CARD_HEIGHT_SIMPLE + CARD_SPACING_SIMPLE;
+    ILI9488_FilledRectangle(card_x1, temp_card_y, card_x2, temp_card_y + CARD_HEIGHT_SIMPLE, GRAY);
+    ILI9488_DrawString(card_x1 + 18, temp_card_y + card_text_y_offset, 2.5, "Temperature", WHITE, GRAY);
     ILI9488_DrawString(card_x2 - 50, temp_card_y + card_text_y_offset, 2, "C", LIGHT_GRAY, GRAY);
 
     // Notes card
-    uint16_t notes_card_y = temp_card_y + CARD_HEIGHT + CARD_SPACING;
-    ILI9488_FilledRectangle(card_x1, notes_card_y, card_x2, notes_card_y + NOTES_HEIGHT, GRAY);
-    ILI9488_DrawString(card_x1 + 15, notes_card_y + 12, 2, "Notes (Optional)", WHITE, GRAY);
-    ILI9488_DrawString(card_x1 + 15, notes_card_y + 35, 2, "Tap to add notes", LIGHT_GRAY, GRAY);
+    uint16_t notes_card_y = temp_card_y + CARD_HEIGHT_SIMPLE + CARD_SPACING_SIMPLE;
+    ILI9488_FilledRectangle(card_x1, notes_card_y, card_x2, notes_card_y + NOTES_HEIGHT_SIMPLE, GRAY);
+    ILI9488_DrawString(card_x1 + 18, notes_card_y + 12, 2, "Notes (Optional)", WHITE, GRAY);
+    ILI9488_DrawString(card_x1 + 18, notes_card_y + 35, 2, "Tap to add notes", LIGHT_GRAY, GRAY);
 
     // ===== BOTTOM BUTTONS =====
-    // Two buttons at the bottom with proper spacing (matching other screens)
-    const uint16_t BOTTOM_BUTTON_WIDTH = 200;
+    // Two buttons at the bottom (smaller)
+    const uint16_t BOTTOM_BUTTON_WIDTH = 180;
     const uint16_t TOTAL_BUTTON_WIDTH = (BOTTOM_BUTTON_WIDTH * 2) + BUTTON_SPACING;
     const uint16_t BOTTOM_START_X = (SCREEN_WIDTH - TOTAL_BUTTON_WIDTH) / 2;
 
@@ -742,6 +786,372 @@ void Plot_Touchscreen_AddSchedule_Screen(uint16_t year, uint8_t month, uint8_t d
                        "Cancel", GRAY, WHITE, LIGHT_GRAY, 3);
 
     // Save button (right)
+    uint16_t save_btn_x1 = cancel_btn_x2 + BUTTON_SPACING;
+    uint16_t save_btn_x2 = save_btn_x1 + BOTTOM_BUTTON_WIDTH;
+    Draw_Modern_Button(save_btn_x1, BOTTOM_BUTTON_Y, save_btn_x2, BOTTOM_BUTTON_Y + BOTTOM_BUTTON_HEIGHT,
+                       "Save", GRAY, WHITE, LIGHT_GRAY, 3);
+}
+
+/**
+ * @brief Schedule wizard - Step 1 (Day selection)
+ */
+void Plot_Touchscreen_ScheduleWizard_Day(uint16_t year, uint8_t month, uint8_t day,
+                                         uint8_t hour, uint8_t minute, uint8_t second,
+                                         uint8_t selected_weekday)
+{
+    char buffer[50];
+
+    const uint16_t SCREEN_WIDTH = 480;
+    const uint16_t SCREEN_HEIGHT = 320;
+    const uint16_t MARGIN = 15;
+    const uint16_t HEADER_HEIGHT = 50;
+    const uint16_t BUTTON_SPACING = 15;
+    const uint16_t BOTTOM_BUTTON_HEIGHT = 45;
+    const uint16_t BOTTOM_BUTTON_Y = SCREEN_HEIGHT - BOTTOM_BUTTON_HEIGHT - MARGIN;
+
+    ILI9488_FillScreen(NAVY_BLUE);
+
+    // Header
+    ILI9488_FilledRectangle(0, 0, SCREEN_WIDTH, HEADER_HEIGHT, DARK_BLUE);
+    ILI9488_DrawString(MARGIN, 8, 2, "Schedule Wizard", WHITE, DARK_BLUE);
+
+    sprintf(buffer, "%02d %02d %04d", day, month, year);
+    ILI9488_DrawString(MARGIN, 30, 2, buffer, LIGHT_GRAY, DARK_BLUE);
+
+    sprintf(buffer, "%02d:%02d:%02d", hour, minute, second);
+    uint16_t time_x = SCREEN_WIDTH - MARGIN - (strlen(buffer) * 6 * 2);
+    ILI9488_DrawString(time_x, 30, 2, buffer, WHITE, DARK_BLUE);
+
+    // Step label (smaller)
+    ILI9488_DrawString(MARGIN, HEADER_HEIGHT + 12, 2.5, "Select day", WHITE, NAVY_BLUE);
+
+    // Day selection chips (all in one row to save space)
+    const uint16_t DAY_BTN_HEIGHT = 50;
+    const uint16_t DAY_BTN_WIDTH = (SCREEN_WIDTH - (MARGIN * 2) - (BUTTON_SPACING * 6)) / 7;
+    uint16_t day_grid_start = HEADER_HEIGHT + 55;
+
+    for (uint8_t i = 0; i < 7; ++i)
+    {
+        uint16_t x1 = MARGIN + i * (DAY_BTN_WIDTH + BUTTON_SPACING);
+        uint16_t x2 = x1 + DAY_BTN_WIDTH;
+        uint16_t y1 = day_grid_start;
+        uint16_t y2 = y1 + DAY_BTN_HEIGHT;
+
+        uint16_t bg = (i == selected_weekday) ? DARK_GRAY : GRAY;
+        Draw_Modern_Button(x1, y1, x2, y2, GetWeekdayShort(i), bg, WHITE, bg, 2.5);
+    }
+
+    // Show selected day (better spacing)
+    const char *weekday_long = GetWeekdayLong(selected_weekday);
+    sprintf(buffer, "Selected: %s", weekday_long);
+    ILI9488_DrawString(MARGIN, day_grid_start + DAY_BTN_HEIGHT + 18, 2, buffer, LIGHT_GRAY, NAVY_BLUE);
+
+    // Knob hint (with icon, moved up)
+    uint16_t knob_y = day_grid_start + DAY_BTN_HEIGHT + 50;
+    uint16_t knob_icon_x = MARGIN;
+    uint16_t knob_icon_y = knob_y + 8;
+    uint16_t knob_icon_radius = 12;
+    ILI9488_drawCircleOutline(knob_icon_x + knob_icon_radius, knob_icon_y, knob_icon_radius, 2, WHITE);
+    ILI9488_drawCircleOutline(knob_icon_x + knob_icon_radius, knob_icon_y, knob_icon_radius - 4, 1, LIGHT_GRAY);
+    ILI9488_FilledRectangle(knob_icon_x + knob_icon_radius - 2, knob_icon_y - 2,
+                            knob_icon_x + knob_icon_radius + 2, knob_icon_y + 2, WHITE);
+    uint16_t knob_text_x = knob_icon_x + (knob_icon_radius * 2) + 10;
+    ILI9488_DrawString(knob_text_x, knob_y, 2, "Use knob to change day", WHITE, NAVY_BLUE);
+
+    // Bottom buttons (consistent colors)
+    const uint16_t BOTTOM_BUTTON_WIDTH = 200;
+    const uint16_t TOTAL_BUTTON_WIDTH = (BOTTOM_BUTTON_WIDTH * 2) + BUTTON_SPACING;
+    const uint16_t BOTTOM_START_X = (SCREEN_WIDTH - TOTAL_BUTTON_WIDTH) / 2;
+
+    uint16_t back_btn_x1 = BOTTOM_START_X;
+    uint16_t back_btn_x2 = back_btn_x1 + BOTTOM_BUTTON_WIDTH;
+    Draw_Modern_Button(back_btn_x1, BOTTOM_BUTTON_Y, back_btn_x2, BOTTOM_BUTTON_Y + BOTTOM_BUTTON_HEIGHT,
+                       "Back", GRAY, WHITE, LIGHT_GRAY, 3);
+
+    uint16_t next_btn_x1 = back_btn_x2 + BUTTON_SPACING;
+    uint16_t next_btn_x2 = next_btn_x1 + BOTTOM_BUTTON_WIDTH;
+    Draw_Modern_Button(next_btn_x1, BOTTOM_BUTTON_Y, next_btn_x2, BOTTOM_BUTTON_Y + BOTTOM_BUTTON_HEIGHT,
+                       "Next", GRAY, WHITE, LIGHT_GRAY, 3);
+}
+
+/**
+ * @brief Schedule wizard - Step 2 (Time selection)
+ */
+void Plot_Touchscreen_ScheduleWizard_Time(uint16_t year, uint8_t month, uint8_t day,
+                                          uint8_t hour, uint8_t minute, uint8_t second,
+                                          uint8_t selected_weekday, uint8_t target_hour, uint8_t target_minute)
+{
+    char buffer[50];
+
+    const uint16_t SCREEN_WIDTH = 480;
+    const uint16_t SCREEN_HEIGHT = 320;
+    const uint16_t MARGIN = 15;
+    const uint16_t HEADER_HEIGHT = 50;
+    const uint16_t BUTTON_SPACING = 15;
+    const uint16_t BOTTOM_BUTTON_HEIGHT = 45;
+    const uint16_t BOTTOM_BUTTON_Y = SCREEN_HEIGHT - BOTTOM_BUTTON_HEIGHT - MARGIN;
+
+    ILI9488_FillScreen(NAVY_BLUE);
+
+    // Header
+    ILI9488_FilledRectangle(0, 0, SCREEN_WIDTH, HEADER_HEIGHT, DARK_BLUE);
+    ILI9488_DrawString(MARGIN, 8, 2, "Schedule Wizard", WHITE, DARK_BLUE);
+
+    sprintf(buffer, "%02d %02d %04d", day, month, year);
+    ILI9488_DrawString(MARGIN, 30, 2, buffer, LIGHT_GRAY, DARK_BLUE);
+
+    sprintf(buffer, "%02d:%02d:%02d", hour, minute, second);
+    uint16_t time_x = SCREEN_WIDTH - MARGIN - (strlen(buffer) * 6 * 2);
+    ILI9488_DrawString(time_x, 30, 2, buffer, WHITE, DARK_BLUE);
+
+    // Step label (smaller)
+    ILI9488_DrawString(MARGIN, HEADER_HEIGHT + 12, 2.5, "Set time", WHITE, NAVY_BLUE);
+
+    // Time display panel (consistent with temperature screen)
+    const uint16_t TIME_PANEL_X1 = MARGIN;
+    const uint16_t TIME_PANEL_Y1 = HEADER_HEIGHT + 55;
+    const uint16_t TIME_PANEL_WIDTH = SCREEN_WIDTH - (MARGIN * 2) - 100;
+    const uint16_t TIME_PANEL_HEIGHT = 120;
+    const uint16_t TIME_PANEL_X2 = TIME_PANEL_X1 + TIME_PANEL_WIDTH;
+    const uint16_t TIME_PANEL_Y2 = TIME_PANEL_Y1 + TIME_PANEL_HEIGHT;
+    ILI9488_FilledRectangle(TIME_PANEL_X1, TIME_PANEL_Y1, TIME_PANEL_X2, TIME_PANEL_Y2, BLACK);
+
+    sprintf(buffer, "%02d:%02d", target_hour, target_minute);
+    uint16_t time_text_x = TIME_PANEL_X1 + (TIME_PANEL_WIDTH / 2) - (strlen(buffer) * 6 * 5 / 2);
+    uint16_t time_text_y = TIME_PANEL_Y1 + (TIME_PANEL_HEIGHT / 2) - (8 * 5 / 2);
+    ILI9488_DrawString(time_text_x, time_text_y, 5, buffer, WHITE, BLACK);
+
+    // Increase/decrease buttons (right side, consistent with temperature screen)
+    const uint16_t ADJ_BTN_HEIGHT = 55;
+    const uint16_t ADJ_BTN_WIDTH = 90;
+    uint16_t adj_btn_x1 = SCREEN_WIDTH - MARGIN - ADJ_BTN_WIDTH;
+    uint16_t adj_btn_y1 = TIME_PANEL_Y1;
+    uint16_t adj_btn_y2 = adj_btn_y1 + ADJ_BTN_HEIGHT;
+    Draw_Modern_Button(adj_btn_x1, adj_btn_y1, adj_btn_x1 + ADJ_BTN_WIDTH, adj_btn_y2,
+                       "+", GRAY, WHITE, LIGHT_GRAY, 5);
+
+    uint16_t adj_btn2_y1 = adj_btn_y2 + 10;
+    uint16_t adj_btn2_y2 = adj_btn2_y1 + ADJ_BTN_HEIGHT;
+    Draw_Modern_Button(adj_btn_x1, adj_btn2_y1, adj_btn_x1 + ADJ_BTN_WIDTH, adj_btn2_y2,
+                       "-", GRAY, WHITE, LIGHT_GRAY, 5);
+
+    // Knob hint (with icon, better spacing)
+    uint16_t knob_y = TIME_PANEL_Y2 + 8;
+    uint16_t knob_icon_x = MARGIN;
+    uint16_t knob_icon_y = knob_y + 8;
+    uint16_t knob_icon_radius = 12;
+    ILI9488_drawCircleOutline(knob_icon_x + knob_icon_radius, knob_icon_y, knob_icon_radius, 2, WHITE);
+    ILI9488_drawCircleOutline(knob_icon_x + knob_icon_radius, knob_icon_y, knob_icon_radius - 4, 1, LIGHT_GRAY);
+    ILI9488_FilledRectangle(knob_icon_x + knob_icon_radius - 2, knob_icon_y - 2,
+                            knob_icon_x + knob_icon_radius + 2, knob_icon_y + 2, WHITE);
+    uint16_t knob_text_x = knob_icon_x + (knob_icon_radius * 2) + 10;
+    ILI9488_DrawString(knob_text_x, knob_y, 2, "Use knob to adjust time", WHITE, NAVY_BLUE);
+
+    // Bottom buttons (consistent colors)
+    const uint16_t BOTTOM_BUTTON_WIDTH = 200;
+    const uint16_t TOTAL_BUTTON_WIDTH = (BOTTOM_BUTTON_WIDTH * 2) + BUTTON_SPACING;
+    const uint16_t BOTTOM_START_X = (SCREEN_WIDTH - TOTAL_BUTTON_WIDTH) / 2;
+
+    uint16_t back_btn_x1 = BOTTOM_START_X;
+    uint16_t back_btn_x2 = back_btn_x1 + BOTTOM_BUTTON_WIDTH;
+    Draw_Modern_Button(back_btn_x1, BOTTOM_BUTTON_Y, back_btn_x2, BOTTOM_BUTTON_Y + BOTTOM_BUTTON_HEIGHT,
+                       "Back", GRAY, WHITE, LIGHT_GRAY, 3);
+
+    uint16_t next_btn_x1 = back_btn_x2 + BUTTON_SPACING;
+    uint16_t next_btn_x2 = next_btn_x1 + BOTTOM_BUTTON_WIDTH;
+    Draw_Modern_Button(next_btn_x1, BOTTOM_BUTTON_Y, next_btn_x2, BOTTOM_BUTTON_Y + BOTTOM_BUTTON_HEIGHT,
+                       "Next", GRAY, WHITE, LIGHT_GRAY, 3);
+}
+
+/**
+ * @brief Schedule wizard - Step 3 (Temperature)
+ */
+void Plot_Touchscreen_ScheduleWizard_Temperature(uint16_t year, uint8_t month, uint8_t day,
+                                                 uint8_t hour, uint8_t minute, uint8_t second,
+                                                 int16_t target_temperature_tenths,
+                                                 uint8_t selected_weekday, uint8_t target_hour, uint8_t target_minute)
+{
+    char buffer[50];
+
+    const uint16_t SCREEN_WIDTH = 480;
+    const uint16_t SCREEN_HEIGHT = 320;
+    const uint16_t MARGIN = 15;
+    const uint16_t HEADER_HEIGHT = 50;
+    const uint16_t BUTTON_SPACING = 15;
+    const uint16_t BOTTOM_BUTTON_HEIGHT = 45;
+    const uint16_t BOTTOM_BUTTON_Y = SCREEN_HEIGHT - BOTTOM_BUTTON_HEIGHT - MARGIN;
+
+    ILI9488_FillScreen(NAVY_BLUE);
+
+    // Header
+    ILI9488_FilledRectangle(0, 0, SCREEN_WIDTH, HEADER_HEIGHT, DARK_BLUE);
+    ILI9488_DrawString(MARGIN, 8, 2, "Schedule Wizard", WHITE, DARK_BLUE);
+
+    sprintf(buffer, "%02d %02d %04d", day, month, year);
+    ILI9488_DrawString(MARGIN, 30, 2, buffer, LIGHT_GRAY, DARK_BLUE);
+
+    sprintf(buffer, "%02d:%02d:%02d", hour, minute, second);
+    uint16_t time_x = SCREEN_WIDTH - MARGIN - (strlen(buffer) * 6 * 2);
+    ILI9488_DrawString(time_x, 30, 2, buffer, WHITE, DARK_BLUE);
+
+    // Step label (smaller)
+    ILI9488_DrawString(MARGIN, HEADER_HEIGHT + 12, 2.5, "Set temperature", WHITE, NAVY_BLUE);
+
+    // Temperature block (centered, larger)
+    const uint16_t TEMP_PANEL_X1 = MARGIN;
+    const uint16_t TEMP_PANEL_Y1 = HEADER_HEIGHT + 55;
+    const uint16_t TEMP_PANEL_WIDTH = SCREEN_WIDTH - (MARGIN * 2) - 100;
+    const uint16_t TEMP_PANEL_HEIGHT = 120;
+    const uint16_t TEMP_PANEL_X2 = TEMP_PANEL_X1 + TEMP_PANEL_WIDTH;
+    const uint16_t TEMP_PANEL_Y2 = TEMP_PANEL_Y1 + TEMP_PANEL_HEIGHT;
+    ILI9488_FilledRectangle(TEMP_PANEL_X1, TEMP_PANEL_Y1, TEMP_PANEL_X2, TEMP_PANEL_Y2, BLACK);
+
+    int16_t temp_whole = target_temperature_tenths / 10;
+    int16_t temp_decimal = target_temperature_tenths % 10;
+    if (temp_decimal < 0)
+    {
+        temp_decimal = -temp_decimal;
+    }
+
+    sprintf(buffer, "%d", temp_whole);
+    uint16_t whole_width = strlen(buffer) * 6 * 6;
+    sprintf(buffer, ".%d", temp_decimal);
+    uint16_t decimal_width = strlen(buffer) * 6 * 4;
+    uint16_t total_width = whole_width + decimal_width + (6 * 4);
+    uint16_t temp_text_x = TEMP_PANEL_X1 + (TEMP_PANEL_WIDTH / 2) - (total_width / 2);
+    uint16_t temp_text_y = TEMP_PANEL_Y1 + (TEMP_PANEL_HEIGHT / 2) - (8 * 6 / 2);
+
+    sprintf(buffer, "%d", temp_whole);
+    ILI9488_DrawString(temp_text_x, temp_text_y, 6, buffer, WHITE, BLACK);
+    sprintf(buffer, ".%d", temp_decimal);
+    ILI9488_DrawString(temp_text_x + whole_width, temp_text_y, 4, buffer, LIGHT_GRAY, BLACK);
+    ILI9488_DrawString(temp_text_x + whole_width + decimal_width + 8, temp_text_y + 8, 4, "C", WHITE, BLACK);
+
+    // Increase/decrease buttons (right side)
+    const uint16_t ADJ_BTN_HEIGHT = 55;
+    const uint16_t ADJ_BTN_WIDTH = 90;
+    uint16_t adj_btn_x1 = SCREEN_WIDTH - MARGIN - ADJ_BTN_WIDTH;
+    uint16_t adj_btn_y1 = TEMP_PANEL_Y1;
+    uint16_t adj_btn_y2 = adj_btn_y1 + ADJ_BTN_HEIGHT;
+    Draw_Modern_Button(adj_btn_x1, adj_btn_y1, adj_btn_x1 + ADJ_BTN_WIDTH, adj_btn_y2,
+                       "+", GRAY, WHITE, LIGHT_GRAY, 5);
+
+    uint16_t adj_btn2_y1 = adj_btn_y2 + 10;
+    uint16_t adj_btn2_y2 = adj_btn2_y1 + ADJ_BTN_HEIGHT;
+    Draw_Modern_Button(adj_btn_x1, adj_btn2_y1, adj_btn_x1 + ADJ_BTN_WIDTH, adj_btn2_y2,
+                       "-", GRAY, WHITE, LIGHT_GRAY, 5);
+
+    // Knob hint (with icon, better spacing)
+    uint16_t knob_y = TEMP_PANEL_Y2 + 8;
+    uint16_t knob_icon_x = MARGIN;
+    uint16_t knob_icon_y = knob_y + 8;
+    uint16_t knob_icon_radius = 12;
+    ILI9488_drawCircleOutline(knob_icon_x + knob_icon_radius, knob_icon_y, knob_icon_radius, 2, WHITE);
+    ILI9488_drawCircleOutline(knob_icon_x + knob_icon_radius, knob_icon_y, knob_icon_radius - 4, 1, LIGHT_GRAY);
+    ILI9488_FilledRectangle(knob_icon_x + knob_icon_radius - 2, knob_icon_y - 2,
+                            knob_icon_x + knob_icon_radius + 2, knob_icon_y + 2, WHITE);
+    uint16_t knob_text_x = knob_icon_x + (knob_icon_radius * 2) + 10;
+    ILI9488_DrawString(knob_text_x, knob_y, 2, "Use knob to adjust temperature", WHITE, NAVY_BLUE);
+
+    // Bottom buttons
+    const uint16_t BOTTOM_BUTTON_WIDTH = 200;
+    const uint16_t TOTAL_BUTTON_WIDTH = (BOTTOM_BUTTON_WIDTH * 2) + BUTTON_SPACING;
+    const uint16_t BOTTOM_START_X = (SCREEN_WIDTH - TOTAL_BUTTON_WIDTH) / 2;
+
+    uint16_t prev_btn_x1 = BOTTOM_START_X;
+    uint16_t prev_btn_x2 = prev_btn_x1 + BOTTOM_BUTTON_WIDTH;
+    Draw_Modern_Button(prev_btn_x1, BOTTOM_BUTTON_Y, prev_btn_x2, BOTTOM_BUTTON_Y + BOTTOM_BUTTON_HEIGHT,
+                       "Back", GRAY, WHITE, LIGHT_GRAY, 3);
+
+    uint16_t next_btn_x1 = prev_btn_x2 + BUTTON_SPACING;
+    uint16_t next_btn_x2 = next_btn_x1 + BOTTOM_BUTTON_WIDTH;
+    Draw_Modern_Button(next_btn_x1, BOTTOM_BUTTON_Y, next_btn_x2, BOTTOM_BUTTON_Y + BOTTOM_BUTTON_HEIGHT,
+                       "Next", GRAY, WHITE, LIGHT_GRAY, 3);
+}
+
+/**
+ * @brief Schedule wizard - Step 4 (Name & summary)
+ */
+void Plot_Touchscreen_ScheduleWizard_Name(uint16_t year, uint8_t month, uint8_t day,
+                                          uint8_t hour, uint8_t minute, uint8_t second,
+                                          const char *entry_name, int16_t target_temperature_tenths,
+                                          uint8_t selected_weekday, uint8_t target_hour, uint8_t target_minute)
+{
+    char buffer[50];
+
+    const uint16_t SCREEN_WIDTH = 480;
+    const uint16_t SCREEN_HEIGHT = 320;
+    const uint16_t MARGIN = 15;
+    const uint16_t HEADER_HEIGHT = 50;
+    const uint16_t BUTTON_SPACING = 15;
+    const uint16_t BOTTOM_BUTTON_HEIGHT = 45;
+    const uint16_t BOTTOM_BUTTON_Y = SCREEN_HEIGHT - BOTTOM_BUTTON_HEIGHT - MARGIN;
+
+    ILI9488_FillScreen(NAVY_BLUE);
+
+    ILI9488_FilledRectangle(0, 0, SCREEN_WIDTH, HEADER_HEIGHT, DARK_BLUE);
+    ILI9488_DrawString(MARGIN, 8, 2, "Schedule Wizard", WHITE, DARK_BLUE);
+
+    sprintf(buffer, "%02d %02d %04d", day, month, year);
+    ILI9488_DrawString(MARGIN, 30, 2, buffer, LIGHT_GRAY, DARK_BLUE);
+    sprintf(buffer, "%02d:%02d:%02d", hour, minute, second);
+    uint16_t time_x = SCREEN_WIDTH - MARGIN - (strlen(buffer) * 6 * 2);
+    ILI9488_DrawString(time_x, 30, 2, buffer, WHITE, DARK_BLUE);
+
+    // Step label (smaller)
+    ILI9488_DrawString(MARGIN, HEADER_HEIGHT + 12, 2.5, "Name & confirm", WHITE, NAVY_BLUE);
+
+    // Name card (smaller text, better spacing)
+    uint16_t name_card_y = HEADER_HEIGHT + 42;
+    uint16_t name_card_height = 55;
+    uint16_t name_card_x1 = MARGIN;
+    uint16_t name_card_x2 = SCREEN_WIDTH - MARGIN;
+
+    ILI9488_FilledRectangle(name_card_x1, name_card_y, name_card_x2, name_card_y + name_card_height, GRAY);
+    ILI9488_DrawString(name_card_x1 + 15, name_card_y + 10, 2, "Schedule name", LIGHT_GRAY, GRAY);
+    ILI9488_DrawString(name_card_x1 + 15, name_card_y + 28, 2.5, entry_name, WHITE, GRAY);
+
+    // Summary cards (smaller text, more compact, better spacing)
+    uint16_t summary_y = name_card_y + name_card_height + 12;
+    uint16_t summary_card_width = (SCREEN_WIDTH - (MARGIN * 2) - BUTTON_SPACING) / 2;
+    uint16_t summary_card_height = 65;
+
+    // Day/time card (smaller text)
+    uint16_t day_card_x1 = MARGIN;
+    uint16_t day_card_x2 = day_card_x1 + summary_card_width;
+    ILI9488_FilledRectangle(day_card_x1, summary_y, day_card_x2, summary_y + summary_card_height, DARK_GRAY);
+    const char *weekday_long = GetWeekdayLong(selected_weekday);
+    sprintf(buffer, "%s", weekday_long);
+    ILI9488_DrawString(day_card_x1 + 12, summary_y + 10, 2, "Day", LIGHT_GRAY, DARK_GRAY);
+    ILI9488_DrawString(day_card_x1 + 12, summary_y + 28, 2.5, buffer, WHITE, DARK_GRAY);
+    sprintf(buffer, "%02d:%02d", target_hour, target_minute);
+    ILI9488_DrawString(day_card_x1 + 12, summary_y + 48, 2.5, buffer, WHITE, DARK_GRAY);
+
+    // Temperature card (smaller text)
+    uint16_t temp_card_x1 = day_card_x2 + BUTTON_SPACING;
+    uint16_t temp_card_x2 = temp_card_x1 + summary_card_width;
+    ILI9488_FilledRectangle(temp_card_x1, summary_y, temp_card_x2, summary_y + summary_card_height, DARK_GRAY);
+    ILI9488_DrawString(temp_card_x1 + 12, summary_y + 10, 2, "Temperature", LIGHT_GRAY, DARK_GRAY);
+
+    int16_t temp_whole = target_temperature_tenths / 10;
+    int16_t temp_decimal = target_temperature_tenths % 10;
+    if (temp_decimal < 0)
+    {
+        temp_decimal = -temp_decimal;
+    }
+    sprintf(buffer, "%d.%d C", temp_whole, temp_decimal);
+    ILI9488_DrawString(temp_card_x1 + 12, summary_y + 35, 2.5, buffer, WHITE, DARK_GRAY);
+
+    // Bottom buttons (consistent colors)
+    const uint16_t BOTTOM_BUTTON_WIDTH = 200;
+    const uint16_t TOTAL_BUTTON_WIDTH = (BOTTOM_BUTTON_WIDTH * 2) + BUTTON_SPACING;
+    const uint16_t BOTTOM_START_X = (SCREEN_WIDTH - TOTAL_BUTTON_WIDTH) / 2;
+
+    uint16_t cancel_btn_x1 = BOTTOM_START_X;
+    uint16_t cancel_btn_x2 = cancel_btn_x1 + BOTTOM_BUTTON_WIDTH;
+    Draw_Modern_Button(cancel_btn_x1, BOTTOM_BUTTON_Y, cancel_btn_x2, BOTTOM_BUTTON_Y + BOTTOM_BUTTON_HEIGHT,
+                       "Back", GRAY, WHITE, LIGHT_GRAY, 3);
+
     uint16_t save_btn_x1 = cancel_btn_x2 + BUTTON_SPACING;
     uint16_t save_btn_x2 = save_btn_x1 + BOTTOM_BUTTON_WIDTH;
     Draw_Modern_Button(save_btn_x1, BOTTOM_BUTTON_Y, save_btn_x2, BOTTOM_BUTTON_Y + BOTTOM_BUTTON_HEIGHT,

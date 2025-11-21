@@ -3,6 +3,13 @@
 ../Core/Src/GUI.c:253:6:Plot_GUI_screen_3	1
 ../Core/Src/GUI.c:316:6:Plot_GUI_screen_4	1
 ../Core/Src/GUI.c:367:13:Draw_Modern_Button	1
-../Core/Src/GUI.c:397:6:Plot_Touchscreen_Temperature_Screen	2
-../Core/Src/GUI.c:556:6:Plot_Touchscreen_Schedule_Screen	1
-../Core/Src/GUI.c:668:6:Plot_Touchscreen_AddSchedule_Screen	1
+../Core/Src/GUI.c:385:20:GetWeekdayShort	2
+../Core/Src/GUI.c:394:20:GetWeekdayLong	2
+../Core/Src/GUI.c:403:13:Draw_Wizard_Progress	4
+../Core/Src/GUI.c:438:6:Plot_Touchscreen_Temperature_Screen	2
+../Core/Src/GUI.c:597:6:Plot_Touchscreen_Schedule_Screen	1
+../Core/Src/GUI.c:709:6:Plot_Touchscreen_AddSchedule_Screen	1
+../Core/Src/GUI.c:798:6:Plot_Touchscreen_ScheduleWizard_Day	3
+../Core/Src/GUI.c:880:6:Plot_Touchscreen_ScheduleWizard_Time	1
+../Core/Src/GUI.c:969:6:Plot_Touchscreen_ScheduleWizard_Temperature	2
+../Core/Src/GUI.c:1075:6:Plot_Touchscreen_ScheduleWizard_Name	2
